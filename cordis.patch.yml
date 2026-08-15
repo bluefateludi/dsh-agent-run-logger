@@ -1,0 +1,8 @@
+- insert:
+    - id: agent-run-logger
+      name: dsh-agent-run-logger
+      config:
+        outputDir: .dsh/traces
+        includeContent: false
+        maxContentBytes: 65536
+        maxPendingBytes: 4194304
