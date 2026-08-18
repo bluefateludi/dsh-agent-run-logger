@@ -1,4 +1,5 @@
 import type { CapturedContent } from './types.js'
+import { redactSensitiveContent, type RedactionOptions } from './redaction.js'
 
 /** Return the longest prefix whose UTF-8 encoding fits the requested byte count. */
 function utf8Prefix(value: string, maxBytes: number): string {
@@ -41,13 +42,18 @@ function isLowSurrogate(code: number): boolean {
   return code >= 0xDC00 && code <= 0xDFFF
 }
 
-/** Capture a JSON value without exceeding its configured UTF-8 content budget. */
-export function captureContent(value: unknown, maxBytes: number): CapturedContent {
-  const serialized = JSON.stringify(value) ?? 'null'
+/** Redact and capture a JSON value without exceeding its configured UTF-8 content budget. */
+export function captureContent(
+  value: unknown,
+  maxBytes: number,
+  redaction: RedactionOptions = {},
+): CapturedContent {
+  const safeValue = redactSensitiveContent(value, redaction)
+  const serialized = JSON.stringify(safeValue) ?? 'null'
   const originalBytes = Buffer.byteLength(serialized)
   if (originalBytes <= maxBytes) {
     return {
-      content: structuredClone(value),
+      content: safeValue,
       truncated: false,
       originalBytes,
       capturedBytes: originalBytes,

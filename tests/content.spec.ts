@@ -21,4 +21,14 @@ describe('captureContent', () => {
     expect(captured.contentPreview.head).not.toContain('\uFFFD')
     expect(captured.contentPreview.tail).not.toContain('\uFFFD')
   })
+
+  it('redacts before applying the content byte limit', () => {
+    const secret = 'Bearer this-token-would-have-crossed-the-truncation-boundary'
+    const captured = captureContent({ authorization: secret, text: 'safe' }, 100)
+    expect(captured).toMatchObject({
+      content: { authorization: '[REDACTED]', text: 'safe' },
+      truncated: false,
+    })
+    expect(JSON.stringify(captured)).not.toContain('this-token')
+  })
 })

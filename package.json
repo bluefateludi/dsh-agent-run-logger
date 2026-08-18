@@ -1,7 +1,7 @@
 {
   "name": "dsh-agent-run-logger",
-  "version": "0.1.0",
-  "description": "Local JSONL run traces for DeepSeek Harness sessions",
+  "version": "0.2.0",
+  "description": "Local JSONL run traces and a live viewer for DeepSeek Harness sessions",
   "keywords": [
     "deepseek-harness",
     "dsh-plugin",
@@ -18,6 +18,9 @@
     "url": "https://github.com/bluefateludi/dsh-agent-run-logger/issues"
   },
   "type": "module",
+  "bin": {
+    "dsh-agent-run-logger": "./lib/cli.js"
+  },
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "exports": {
@@ -28,6 +31,8 @@
   },
   "files": [
     "lib",
+    "web",
+    "docs",
     "cordis.patch.yml",
     "README.md",
     "README.zh.md",

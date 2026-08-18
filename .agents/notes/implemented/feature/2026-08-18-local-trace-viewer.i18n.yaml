@@ -1,0 +1,4 @@
+# Bilingual-pair consistency record: the git blob hash of each side as of the
+# last confirmed-consistent state. Both languages carry equal authority.
+2026-08-18-local-trace-viewer.md: 5460790ff517fceaf622fea20dc38b7aefa7b2af
+2026-08-18-local-trace-viewer.zh.md: 27c30ca654e578fad7a29a28c8e1cc44c6e3c56b

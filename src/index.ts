@@ -34,6 +34,8 @@ export const Config: z<ConfigShape> = z.object({
   includeContent: z.boolean().default(false),
   maxContentBytes: z.number().min(1).step(1).default(DEFAULT_MAX_CONTENT_BYTES),
   maxPendingBytes: z.number().min(1).step(1).default(DEFAULT_MAX_PENDING_BYTES),
+  redactSensitiveContent: z.boolean().default(true),
+  redactKeys: z.array(z.string().min(1)).default([]),
 })
 
 /** Mount the run-trace projection and independent per-session writers. */
@@ -99,6 +101,8 @@ function resolveConfig(config: ConfigShape): ResolvedConfig {
     includeContent: config.includeContent ?? false,
     maxContentBytes: config.maxContentBytes ?? DEFAULT_MAX_CONTENT_BYTES,
     maxPendingBytes: config.maxPendingBytes ?? DEFAULT_MAX_PENDING_BYTES,
+    redactSensitiveContent: config.redactSensitiveContent ?? true,
+    redactKeys: config.redactKeys ?? [],
   }
   if (resolved.outputDir.length === 0) throw new Error('agent-run-logger: outputDir must not be empty')
   assertPositiveInteger('maxContentBytes', resolved.maxContentBytes)
