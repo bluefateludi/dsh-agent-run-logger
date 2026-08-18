@@ -8,6 +8,10 @@ export interface Config {
   maxContentBytes?: number
   /** Maximum queued JSONL bytes for each session writer. */
   maxPendingBytes?: number
+  /** Whether credential-like values are removed before captured content is persisted. */
+  redactSensitiveContent?: boolean
+  /** Additional case-insensitive object-key names removed before persistence. */
+  redactKeys?: string[]
 }
 
 /** Fully resolved plugin configuration. */
@@ -16,6 +20,8 @@ export interface ResolvedConfig {
   includeContent: boolean
   maxContentBytes: number
   maxPendingBytes: number
+  redactSensitiveContent: boolean
+  redactKeys: readonly string[]
 }
 
 /** A content value retained in full or represented by a bounded preview. */

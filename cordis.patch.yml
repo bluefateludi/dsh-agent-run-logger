@@ -6,3 +6,5 @@
         includeContent: false
         maxContentBytes: 65536
         maxPendingBytes: 4194304
+        redactSensitiveContent: true
+        redactKeys: []

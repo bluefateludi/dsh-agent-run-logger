@@ -31,6 +31,8 @@ describe('RunTraceProjector', () => {
       includeContent: true,
       maxContentBytes: 128,
       maxPendingBytes: 16_384,
+      redactSensitiveContent: true,
+      redactKeys: [],
     }
     const writer = new SessionWriter({ path, sessionId: session.id, maxPendingBytes: config.maxPendingBytes, warn: () => undefined })
     const projector = new RunTraceProjector(session, writer, config)
@@ -81,6 +83,7 @@ describe('RunTraceProjector', () => {
     const writer = new SessionWriter({ path, sessionId: 's', maxPendingBytes: 4096, warn: () => undefined })
     const projector = new RunTraceProjector(session, writer, {
       outputDir: '.dsh/traces', includeContent: false, maxContentBytes: 64, maxPendingBytes: 4096,
+      redactSensitiveContent: true, redactKeys: [],
     })
     projector.accept(event('tool/call', 1, 10, { turn: 1, step: 1, callId: 'c', name: 'secret', arguments: 'TOP_SECRET' }))
     await writer.dispose()

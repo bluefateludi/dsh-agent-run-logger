@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>DSH Flight Recorder</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#timeline">Skip to timeline</a>
+    <header class="masthead">
+      <div class="brand" aria-label="DeepSeek Harness flight recorder">
+        <span class="brand-mark" aria-hidden="true">DSH</span>
+        <span class="brand-name">Flight Recorder</span>
+        <span class="live-indicator"><i aria-hidden="true"></i><span id="connection-label">connecting</span></span>
+      </div>
+      <div class="trace-clock">
+        <span>LOCAL TRACE TIME</span>
+        <time id="trace-clock">--:--:--.---</time>
+      </div>
+    </header>
+
+    <section class="summary-rail" aria-label="Trace summary">
+      <div class="metric metric-primary"><span>Runs</span><strong id="metric-runs">—</strong></div>
+      <div class="metric metric-danger"><span>Failures</span><strong id="metric-failures">—</strong></div>
+      <div class="metric"><span>Model time</span><strong id="metric-model">—</strong></div>
+      <div class="metric"><span>Tool time</span><strong id="metric-tools">—</strong></div>
+      <div class="metric"><span>Tokens</span><strong id="metric-tokens">—</strong></div>
+      <div class="metric metric-warning"><span>Gaps</span><strong id="metric-gaps">—</strong></div>
+      <div class="metric metric-warning"><span>Truncated</span><strong id="metric-truncated">—</strong></div>
+    </section>
+
+    <main class="console-layout">
+      <aside class="navigator panel" aria-labelledby="sessions-heading">
+        <div class="panel-heading">
+          <div><span class="eyebrow">01 / INDEX</span><h1 id="sessions-heading">Sessions</h1></div>
+          <span class="count-badge" id="session-count">0</span>
+        </div>
+        <div class="session-filters">
+          <label class="search-field">
+            <span class="sr-only">Filter sessions</span>
+            <span aria-hidden="true">⌕</span>
+            <input id="session-search" type="search" placeholder="session, cwd, preset…" autocomplete="off">
+            <kbd>/</kbd>
+          </label>
+          <label class="select-field">
+            <span>Status</span>
+            <select id="status-filter">
+              <option value="all">All signals</option>
+              <option value="failed">Failures</option>
+              <option value="live">Live</option>
+              <option value="warning">Warnings</option>
+            </select>
+          </label>
+        </div>
+        <div id="global-diagnostics" class="diagnostic-stack" aria-live="polite"></div>
+        <nav id="session-list" class="session-list" aria-label="Trace sessions"></nav>
+        <div id="empty-sessions" class="empty-state" hidden>
+          <span class="empty-radar" aria-hidden="true"></span>
+          <strong>No trace signal</strong>
+          <p>Waiting for JSONL records in the configured trace directory.</p>
+        </div>
+      </aside>
+
+      <section class="timeline-panel panel" aria-labelledby="timeline-heading">
+        <div class="panel-heading timeline-heading-row">
+          <div><span class="eyebrow">02 / CHRONOLOGY</span><h2 id="timeline-heading">Waterfall</h2></div>
+          <div class="timeline-tools">
+            <button id="zoom-out" class="icon-button" type="button" aria-label="Zoom out">−</button>
+            <output id="zoom-label" aria-live="polite">100%</output>
+            <button id="zoom-in" class="icon-button" type="button" aria-label="Zoom in">+</button>
+          </div>
+        </div>
+        <div class="active-session-strip">
+          <div><span id="active-status" class="signal-dot"></span><strong id="active-session">Select a session</strong></div>
+          <span id="active-range">—</span>
+        </div>
+        <div class="event-filters" role="group" aria-label="Timeline event filters">
+          <button type="button" class="filter-chip is-active" data-kind="run"><i></i>Runs</button>
+          <button type="button" class="filter-chip is-active" data-kind="step"><i></i>Steps</button>
+          <button type="button" class="filter-chip is-active" data-kind="llm"><i></i>Model</button>
+          <button type="button" class="filter-chip is-active" data-kind="tool"><i></i>Tools</button>
+          <button type="button" class="filter-chip is-active" data-kind="warning"><i></i>Warnings</button>
+          <span class="key-hint"><kbd>J</kbd><kbd>K</kbd> navigate <kbd>↵</kbd> inspect</span>
+        </div>
+        <div id="timeline" class="timeline" tabindex="0" aria-label="Session event waterfall">
+          <div id="time-axis" class="time-axis" aria-hidden="true"></div>
+          <div id="timeline-rows" class="timeline-rows"></div>
+          <div id="empty-timeline" class="empty-state timeline-empty">
+            <strong>No session selected</strong>
+            <p>Choose a signal from the index to inspect its recorded chronology.</p>
+          </div>
+        </div>
+        <div id="timeline-diagnostics" class="timeline-diagnostics"></div>
+      </section>
+
+      <aside id="detail-panel" class="detail-panel panel" aria-labelledby="detail-heading" aria-hidden="false">
+        <div class="panel-heading">
+          <div><span class="eyebrow">03 / INSPECTOR</span><h2 id="detail-heading">Event detail</h2></div>
+          <button id="close-detail" class="icon-button close-detail" type="button" aria-label="Close event detail">×</button>
+        </div>
+        <div id="detail-empty" class="empty-state detail-empty">
+          <span class="crosshair" aria-hidden="true"></span>
+          <strong>Awaiting selection</strong>
+          <p>Select a waterfall row to inspect timestamps, durations, identifiers, and raw fields.</p>
+        </div>
+        <div id="detail-content" class="detail-content" hidden>
+          <div class="detail-title-block">
+            <span id="detail-kind" class="type-tag">event</span>
+            <h3 id="detail-title">—</h3>
+            <p id="detail-subtitle">—</p>
+          </div>
+          <dl id="detail-facts" class="fact-grid"></dl>
+          <section id="sensitive-section" class="sensitive-section" hidden>
+            <div class="sensitivity-notice"><span aria-hidden="true">⚿</span><p><strong>Captured content</strong><br>May contain sensitive trace data. Review locally.</p></div>
+            <details id="captured-content"><summary>Reveal captured values</summary><pre id="content-json"></pre></details>
+          </section>
+          <details class="raw-record"><summary>Raw record</summary><pre id="raw-json"></pre></details>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="status-bar">
+      <span><i class="status-led" aria-hidden="true"></i><span id="footer-status">Establishing event stream</span></span>
+      <span id="record-count">0 records indexed</span>
+      <span>READ ONLY · LOOPBACK</span>
+    </footer>
+    <div id="drawer-scrim" class="drawer-scrim" hidden></div>
+    <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

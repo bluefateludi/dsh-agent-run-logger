@@ -89,7 +89,7 @@ export class RunTraceProjector {
       case 'user/message': {
         if (!this.config.includeContent) break
         const state = newestOpenStep(this.steps)
-        if (state !== undefined) state.inputs.push(captureContent(event.data, this.config.maxContentBytes))
+        if (state !== undefined) state.inputs.push(this.capture(event.data))
         break
       }
       case 'assistant/chunk': {
@@ -118,7 +118,7 @@ export class RunTraceProjector {
           ...(event.data.usage === undefined ? {} : { usage: event.data.usage }),
           ...(this.config.includeContent ? {
             input: state?.inputs ?? [],
-            output: captureContent(event.data.message, this.config.maxContentBytes),
+            output: this.capture(event.data.message),
           } : {}),
         })
         break
@@ -138,7 +138,7 @@ export class RunTraceProjector {
           step: event.data.step,
           name: event.data.name,
           ...(this.config.includeContent
-            ? { arguments: captureContent(event.data.arguments, this.config.maxContentBytes) }
+            ? { arguments: this.capture(event.data.arguments) }
             : {}),
         })
         break
@@ -162,7 +162,7 @@ export class RunTraceProjector {
             errorCode: event.data.error.code,
           }),
           ...(this.config.includeContent
-            ? { result: captureContent(event.data.message, this.config.maxContentBytes) }
+            ? { result: this.capture(event.data.message) }
             : {}),
         })
         this.tools.delete(callId)
@@ -225,6 +225,14 @@ export class RunTraceProjector {
       turn: state.turn,
       step: state.step,
     }
+  }
+
+  /** Redact sensitive values before applying the configured content byte limit. */
+  private capture(value: unknown): CapturedContent {
+    return captureContent(value, this.config.maxContentBytes, {
+      enabled: this.config.redactSensitiveContent,
+      keys: this.config.redactKeys,
+    })
   }
 }
 
